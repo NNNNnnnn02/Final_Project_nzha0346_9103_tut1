@@ -1,0 +1,361 @@
+const DESIGN_H = 800;
+const DESIGN_W = 600;
+
+let branches = [];
+let apples = [];
+let gravity = 0.2;  
+let gravityDirection = 1;
+let ground = 750;
+let topY = 20;
+let noisePoints = [];
+let scaleFactor;
+
+let rawSegments = [];
+let appleSpecs = [];
+let segIdCounter = 0;
+let maxLevel = 0;
+
+let growthStart = 0;
+let totalGrowDuration = 7000;
+
+
+//Segment Class (Tree Branch).
+class Segment{
+  constructor(x,y,length,angle,level, x2, y2, id){
+    this.x = x;
+    this.y = y;
+    this.length = length;
+    this.angle = angle;
+    this.level = level;
+    this.id = id;
+
+  //Different thickness for different branch level.
+    if(this.level === 1){
+      this.thickness = 15;
+    } else if(this.level === 2){
+      this.thickness = 10;
+    } else if(this.level === 3){
+      this.thickness = 7;
+    } else{
+      this.thickness = 4
+    }
+  // Small waving animation values.
+    this.swayAmp = random(1,3);
+  // Calculate the end point of the branch based on angle.
+    this.x2 = x2;
+    this.y2 = y2;
+
+    this. revealTime = 0;
+    this. growDuration = 500;
+  }
+
+  
+    // Set branches' color
+    stroke(0);
+    strokeWeight(this.thickness);
+    // Small animation using sin() to simulate "wind".
+    let tNow = millis();
+    let progress = constrain((tNow - this.revealTime) / this.growDuration, 0, 1);
+    
+    let newX = lerp(this.x, this.x2, progress);
+    let newY = lerp(this.y, this.y2, progress);
+    
+    if (progress < 1){
+      line(this.x, this.y, newX, newY);
+    } else {
+
+    let sway = sin(frameCount* this.swaySpeed + this.y * 0.05)* this.swayAmp;
+    let swayX = this.x + cos(this.angle + radians(sway * 0.5)) * this.length;
+    let swayY = this.y - sin(this.angle + radians(sway * 0.5)) * this.length;
+    line(this.x, this.y, swayX, swayY);
+    }
+    //let branches silghtly wave.
+  }
+}
+// Apple class(generate, sway, drop)
+class Apple {
+  constructor(x,y,color){
+    this.stratX = x;
+    this.stratY = y;
+    this.x = x;
+    this.y = y;
+    this.dropSpeed = 0;
+    this.color = color;
+    this.state = "waiting";
+    this.timer = 0; 
+    // Slight left and right swing while apple are hanging.
+    this.swayRate = random(1.0, 3.0);    
+    this.swaySpeed = random(0.5, 0.3); 
+    this.swayPhase = random(0, TWO_PI); 
+  }     
+  reset(){
+    // Reset apple to initial position.
+    this.x = this.stratX;
+    this.y = this.stratY;
+    this.dropSpeed = 0;
+    this.state = "waiting";
+    this.timer = 0;
+    this.swayPhase = random(0, TWO_PI);
+  }
+  update(){
+    if (millis() < this.appearTime) return;
+
+    if (this.state ==="waiting"){
+      // Waiting for 2 seconds before falling.
+      this.timer++;
+      if(this.timer > 120){
+        this.state = "falling";
+        this.timer = 0;
+      }
+    } else if (this.state ==="falling"){
+      // Apply gravity.
+      this.dropSpeed += gravity * gravityDirection;
+      this.y += this.dropSpeed;
+    // Hit ground.
+    if(gravityDirection === 1 && this.y >= ground){
+      this.y = ground;
+      this.state = "landed";
+      this.dropSpeed = 0;
+      this.timer = 0;
+    // Hit top(when reversed gravity)
+    } else if (gravityDirection === -1 && this.y <=topY){
+      this.y = topY;
+      this.state = "landed";
+      this.dropSpeed = 0;
+      this.timer = 0;
+    }
+  }
+      else if (this.state === "landed"){
+        // Rest for 2 seconds then return to tree.
+        this.timer++;
+        if(this.timer > 120){
+          this.reset();
+        }
+      }
+    }
+  
+  draw(){
+    if (millis()< this.appearTime) return;
+
+    stroke(225,225,0);
+    fill(this.color[0],this.color[1],this.color[2]);
+    
+    let drawX = this.x;
+    let drawY = this.y;
+  // Slight sway when hanging.
+    if (this.state === "waiting") {
+      const t = frameCount * this.swaySpeed + this.swayPhase;
+      drawX += sin(t) * this.swayRate;}
+
+    
+      ellipse(drawX, drawY, 40, 40);
+  }
+}
+//Recursive Tree Generator
+function generateTree(x, y, length, angle, level){
+  if (length < 40) return;
+   let id = segIdCounter++;
+   let x2 = x + cos(angle) * length;
+   let y2 = y - sin(angle) * length;
+  
+   rawSegments.push({
+    id: id,
+    x: x,
+    y: y,
+    length: length,
+    angle: angle,
+    level: level,
+    x2: x2,
+    y2: y2
+   });
+
+  //Random chance to grow an apple on highter level branch.
+  if (level >= 3 && random()<0.2){
+    let t = random(0.3, 0.9);
+    let colorChoice = [
+      [240,70,70],
+      [240,140,60],
+      [220,120,120],
+      [230,90,140],
+      [250,120,90],
+      [210,100,150]
+    ];
+    let c = random(colorChoice);
+    apples.push(new Apple(appleX, appleY, c));
+  }
+  /*The transition from "if(level >= 3)" to "apples.push(new Apple(appleX, appleY, c));"
+  is partly obtained by asking ChatGPT, The specific question-and-answer process will be placed in the appendix.*/
+  if (level > maxLevel) maxLevel = level;
+
+  let angleOffset = random(radians(30), radians(90));
+  generateTree(x2, y2, length* 0.75, angle + angleOffset, level + 1);
+  generateTree(x2, y2, length* 0.75, angle - angleOffset, level + 1);
+}
+function finalizaTree(){
+  totalGrowDuration = random(5000,10000);
+  growthStart = millis();
+
+  for (let s of rawSegments){
+    let perLevel =totalGrowDuration / max(1, maxLevel);
+    let base = growthStart + (s.level - 1)* perLevel;
+    let jitter = random(-perLevel *0.15, perLevel * 0.15);
+    let revealTime = base + jitter;
+    let growDuration = perLevel * random(0.6, 1.0);
+
+    let seg = new Segment(s.x, s.y, s.length, s.angle, s.level, s.x2, s.y2, s.id);
+    seg.revealTime = revealTime;
+    seg.growDuration = growDuration;
+    branches.push(seg);
+  }
+}
+function setup() {
+  createCanvas(windowWidth, windowHeight); 
+  frameRate(60);
+  // Keep 600* 800 proportion across screens.  
+  scaleFactor = min(windowWidth/ DESIGN_W, windowHeight/ DESIGN_H);
+  // Generate background noise lines.
+  for (let i = 0; i < 1000; i++){
+    noisePoints.push({
+      x: random(-width- 1000, width+ 1000),
+      y: random(0, 650),
+      c:[random(100,180), random(150,200), random(200,255), random(80,150)]
+    });
+  }
+
+  segIdCounter = 0;
+  maxLevel = 0;
+  rawSegments = [];
+  appleSpecs = [];
+  generateTree(300, 650, 200, PI / 2, 1);
+  
+  finalizaTree();
+}
+
+// Main draw loop
+function draw(){
+  //base blue background.
+  background(60,80,120);
+  
+  push();
+  scale(scaleFactor);
+  translate((width / scaleFactor - DESIGN_W)/ 2, (height/ scaleFactor - DESIGN_H)/2);
+  // Draw background noise.
+  noStroke();
+  for (let p of noisePoints){
+    fill(p.c[0],p.c[1],p.c[2],p.c[3]);
+    rect(p.x, p.y, 100, 2);
+  }
+  // Ground.
+  fill(40,140,90);
+  rect(0,650,600,100);
+  stroke(0);
+  strokeWeight(5);
+  noFill();
+  rect(0,650,600,100);
+  noStroke();
+
+  // Yellow base
+  fill(240,210,60);
+  stroke(0);
+  strokeWeight(10);
+  rect(125,625,350,75);
+  noStroke();
+
+  // Colorfull rects
+  const colors = [
+    color(240,210,60),
+    color(240,70,70),
+    color(40,160,100),
+    color(240,210,60),
+    color(40,160,100),
+    color(240,210,60)
+  ];
+  const startX = 125;
+  const startY = 625;
+  const boxW = 350 / 6;
+  const boxH = 75;
+ 
+  for (let i = 0; i < 6; i++){
+    fill(colors[i]);
+    rect(startX + i * boxW, startY, boxW, boxH);
+  }
+  
+  const bottomColors = [
+    color(40,160,100),
+    color(240,210,60),
+    color(240,70,70),
+    color(240,70,70),
+    color(240,210,60),
+    color(40,160,100)
+  ];
+
+  for (let i = 0; i < 6; i++){
+    let cx = startX + i * boxW + boxW / 2;
+    let cy = startY + boxH;
+    let r = boxW * 0.9;
+    fill(bottomColors[i]);
+    arc(cx, cy, r, r, PI, 0);
+  }
+
+  const topColors = [
+    color(40, 160, 100),
+    color(240, 70, 70),
+    color(40, 160, 100),
+    color(240, 70, 70)
+  ];
+  const topCenters = [
+    startX + boxW * 1.5,
+    startX + boxW * 2.5,
+    startX + boxW * 3.5,
+    startX + boxW * 4.5
+  ];
+  for (let i = 0; i < 4; i++){
+    let cx = topCenters[i];
+    let cy = startY;
+    let r = (i === 1 || i === 2) ? boxW * 0.7 : boxW * 0.9;
+    fill(topColors[i]);
+    arc(cx,cy,r,r,0,PI);
+  }
+
+  noStroke();
+  for (let i = 0; i < 300; i++){
+    fill(255,255,255,random(10,40));
+    rect(random(125,475),random(625,700), 1, 1);
+  }
+  // Draw all branches.
+  for (let branch of branches ){
+    branch.draw(); 
+  }
+  // Draw and update all apples.
+  for (let a of apples){
+    a.update();
+    a.draw();
+  }
+  // Display gravity control text.
+  noStroke();
+  fill(255);
+  textSize(25);
+  if(gravityDirection === 1){
+    text("Press SPACE to change gravity (now ↓ ↓ ↓)",20,785);
+  }else{
+    text("Press SPACE to change gravity (now ↑ ↑ ↑)",20,785);
+  }
+    text("- Let Newton be confused ! ! ! -",240,30);
+    pop();
+}
+
+// Make the canvas size match the screen size.
+function fitWidow(){
+  resizeCanvas(windowWidth,windowHeight);
+  scaleFactor = min(windowWidth / DESIGN_W, windowHeight/ DESIGN_H);
+}
+// Add keypress to control the direction of gravity.
+function keyPressed(){
+  if (key === ' '){
+    gravityDirection *= -1;
+    for (let a of apples){
+      a.reset();
+    } 
+  }
+}
+
