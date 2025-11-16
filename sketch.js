@@ -219,7 +219,22 @@ function finalizeTree(){
     seg.growDuration = growDuration;
     branches.push(seg);
   }
+  for (let aSpec of appleSpecs){
+    let seg = branches.find(sb => sb.id === aSpec.segId);
+    if (!seg) continue;
+    let appleX = lerp(seg.x, seg.x2, aSpec.t);
+    let appleY = lerp(seg.y,seg.y2, aSpec.t);
+    let a = new Apple(appleX, appleY, aSpec.color);
+
+    a.appearTime = seg.revealTime + seg.growDuration + random(200, 1200);
+    apples.push(a);
+  }
+
+  rawSegments = [];
+  appleSpecs = [];
 }
+
+
 function setup() {
   createCanvas(windowWidth, windowHeight); 
   frameRate(60);
