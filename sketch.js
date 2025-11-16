@@ -41,6 +41,7 @@ class Segment{
     }
   // Small waving animation values.
     this.swayAmp = random(1,3);
+    this.swaySpeed = random(0.2, 0.2);
   // Calculate the end point of the branch based on angle.
     this.x2 = x2;
     this.y2 = y2;
@@ -50,6 +51,7 @@ class Segment{
   }
 
   
+  draw(){
     // Set branches' color
     stroke(0);
     strokeWeight(this.thickness);
@@ -87,6 +89,8 @@ class Apple {
     this.swayRate = random(1.0, 3.0);    
     this.swaySpeed = random(0.5, 0.3); 
     this.swayPhase = random(0, TWO_PI); 
+
+    this.appleTime = 999999999;
   }     
   reset(){
     // Reset apple to initial position.
@@ -154,6 +158,7 @@ class Apple {
 //Recursive Tree Generator
 function generateTree(x, y, length, angle, level){
   if (length < 40) return;
+
    let id = segIdCounter++;
    let x2 = x + cos(angle) * length;
    let y2 = y - sin(angle) * length;
@@ -181,7 +186,11 @@ function generateTree(x, y, length, angle, level){
       [210,100,150]
     ];
     let c = random(colorChoice);
-    apples.push(new Apple(appleX, appleY, c));
+    appleSpecs.push({
+      segId: id,
+      t: t, 
+      color: c
+    });
   }
   /*The transition from "if(level >= 3)" to "apples.push(new Apple(appleX, appleY, c));"
   is partly obtained by asking ChatGPT, The specific question-and-answer process will be placed in the appendix.*/
@@ -191,7 +200,10 @@ function generateTree(x, y, length, angle, level){
   generateTree(x2, y2, length* 0.75, angle + angleOffset, level + 1);
   generateTree(x2, y2, length* 0.75, angle - angleOffset, level + 1);
 }
-function finalizaTree(){
+
+
+function finalizeTree(){
+
   totalGrowDuration = random(5000,10000);
   growthStart = millis();
 
@@ -228,7 +240,7 @@ function setup() {
   appleSpecs = [];
   generateTree(300, 650, 200, PI / 2, 1);
   
-  finalizaTree();
+  finalizeTree();
 }
 
 // Main draw loop
