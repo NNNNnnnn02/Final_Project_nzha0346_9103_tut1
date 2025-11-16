@@ -52,11 +52,15 @@ class Segment{
 
   
   draw(){
+      let tNow = millis();
+      if (tNow < this.revealTime){
+        return;
+      }
     // Set branches' color
     stroke(0);
     strokeWeight(this.thickness);
     // Small animation using sin() to simulate "wind".
-    let tNow = millis();
+    
     let progress = constrain((tNow - this.revealTime) / this.growDuration, 0, 1);
     
     let newX = lerp(this.x, this.x2, progress);
@@ -196,9 +200,11 @@ function generateTree(x, y, length, angle, level){
   is partly obtained by asking ChatGPT, The specific question-and-answer process will be placed in the appendix.*/
   if (level > maxLevel) maxLevel = level;
 
-  let angleOffset = random(radians(30), radians(90));
-  generateTree(x2, y2, length* 0.75, angle + angleOffset, level + 1);
-  generateTree(x2, y2, length* 0.75, angle - angleOffset, level + 1);
+  let angleOffsetL = random(radians(30), radians(90));
+  let angleOffsetR = random(radians(25), radians(85));
+  let jitter = random(-radians(8), radians(8));
+  generateTree(x2, y2, length* 0.75, angle + angleOffsetL + jitter, level + 1);
+  generateTree(x2, y2, length* 0.75, angle - angleOffsetR + jitter, level + 1);
 }
 
 
