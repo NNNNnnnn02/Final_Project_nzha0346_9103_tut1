@@ -9,15 +9,15 @@ This is an interactive animation project based on p5. js, showcasing the complet
 
 ## **Interaction description**
 
-### **1.Auto-play :** 
+ **1.Auto-play :** 
 
 Upon opening the page, the apple tree will automatically commence its growth process (5-10 seconds).
 
-### **2.Restart :** 
+ **2.Restart :** 
 
 Press the spacebar to restart the entire growth process, generating a brand-new random apple tree each time.
 
-### **3.Gravity control :** 
+ **3.Gravity control :** 
 
 During the apple-falling phase, press the spacebar to toggle gravity direction (upwards/downwards).
 
@@ -47,14 +47,14 @@ Tree form, apple positions, and timing are randomly generated each iteration
 
 For my part, I opted to employ time-based animation to drive the entire scene. My objective was to have the apple tree progress from an initial state through a complete, natural life cycle: from branch growth to fruit formation, culminating in the fruit's eventual fall.
 
-### 1. **Time Control** 
+1. **Time Control** 
 
 let growthStart = 0;
 let totalGrowDuration = 7000;
 let rawSegments = [];
 let appleSpecs = [];
 
-### 2. **Branch Growth Animationz**
+2. **Branch Growth Animationz**
 
 -By extending the Segment class, add time control attributes and interpolation calculations
 
@@ -70,7 +70,7 @@ let appleSpecs = [];
     }
  }
 
-### 3.**Randomised design**
+3.**Randomised design**
 
  -Morphological randomness: Random variation in branch bifurcation angles
   -Temporal randomness: Random shifts in growth duration and element emergence timing
@@ -80,7 +80,7 @@ let appleSpecs = [];
    let angleOffsetR = random(radians(25), radians(85));
    let jitter = random(-radians(8), radians(8));
 
-### 4.**Chronological Sequence**
+ 4.**Chronological Sequence**
 
 Apples appear strictly after their respective branches have completed growth
 
@@ -88,7 +88,7 @@ Apples appear strictly after their respective branches have completed growth
 
  These refinements collectively create a dynamic effect where growth progresses sequentially from trunk to twig, apples naturally form and randomly fall, generating uniquely shaped appple trees with each reset.
 
-# **Summary** 
+## **Summary** 
 
 By combining time control(millis, revearlTime), smooth animation(lerp), randomness(random), and layering order, I successfully simulated an apple tree growth animation through code. This animation adheres to natural laws(branches appear first, followed by fruit, then falling) while remaining rich in variation and charm. With each interaction, users witness a sapling possessing its own unique life trajectory.
 
