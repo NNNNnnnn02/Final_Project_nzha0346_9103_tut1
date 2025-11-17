@@ -1,13 +1,13 @@
 # Final_Project_nzha0346_9103_tut1
 
-# **Apple tree_Time Based**
+## **Apple tree_Time Based**
 
-## **Project Overview**
+### **Project Overview**
 This is an interactive animation project based on p5. js, showcasing the complete lifecycle of an apple tree from growth to fruiting to apple drop. Based on our group assignment, I chose Time Based animation as my personal creative direction for this project.
 
 ![image of tree](image.png)
 
-## **Interaction description**
+### **Interaction description**
 
  **1.Auto-play :** 
 
@@ -21,7 +21,7 @@ Press the spacebar to restart the entire growth process, generating a brand-new 
 
 During the apple-falling phase, press the spacebar to toggle gravity direction (upwards/downwards).
 
-## **Personal Creative Realisation** 
+### **Personal Creative Realisation** 
 
 **Animation Drive Method:** 
 
@@ -35,26 +35,29 @@ Unlike other group members, my implementation focuses on
 
 Branches grow hierarchically, progressing from the main trunk to smaller branches
 
-## **Progressive Apple Appearance** 
+### **Progressive Apple Appearance** 
 
 Apples emerge only after branch growth is complete, adhering to natural patterns
 
-## **Randomised Elements** 
+### **Randomised Elements** 
 
 Tree form, apple positions, and timing are randomly generated each iteration
 
-## **Complete Lifecycle**
+### **Complete Lifecycle**
 
 For my part, I opted to employ time-based animation to drive the entire scene. My objective was to have the apple tree progress from an initial state through a complete, natural life cycle: from branch growth to fruit formation, culminating in the fruit's eventual fall.
 
-1. **Time Control** 
+1.**Time Control** 
 
 let growthStart = 0;
+
 let totalGrowDuration = 7000;
+
 let rawSegments = [];
+
 let appleSpecs = [];
 
-2. **Branch Growth Animationz**
+2.**Branch Growth Animationz**
 
 -By extending the Segment class, add time control attributes and interpolation calculations
 
@@ -73,20 +76,24 @@ let appleSpecs = [];
 3.**Randomised design**
 
  -Morphological randomness: Random variation in branch bifurcation angles
+
   -Temporal randomness: Random shifts in growth duration and element emergence timing
+
  -Positional randomness: Random distribution of apples along branches
 
-   let angleOffsetL = random(radians(30), radians(90));
-   let angleOffsetR = random(radians(25), radians(85));
-   let jitter = random(-radians(8), radians(8));
+     let angleOffsetL = random(radians(30), radians(90));
+
+     let angleOffsetR = random(radians(25), radians(85));
+
+     let jitter = random(-radians(8), radians(8));
 
  4.**Chronological Sequence**
 
 Apples appear strictly after their respective branches have completed growth
 
-  appearTime = seg.revealTime + seg.growDuration + random();
+    appearTime = seg.revealTime + seg.growDuration + random();
 
- These refinements collectively create a dynamic effect where growth progresses sequentially from trunk to twig, apples naturally form and randomly fall, generating uniquely shaped appple trees with each reset.
+These refinements collectively create a dynamic effect where growth progresses sequentially from trunk to twig, apples naturally form and randomly fall, generating uniquely shaped appple trees with each reset.
 
 ## **Summary** 
 
