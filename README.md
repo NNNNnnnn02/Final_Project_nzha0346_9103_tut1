@@ -49,29 +49,29 @@ For my part, I opted to employ time-based animation to drive the entire scene. M
 
 1.**Time Control** 
 
-let growthStart = 0;
+     let growthStart = 0;
 
-let totalGrowDuration = 7000;
+     let totalGrowDuration = 7000;
 
-let rawSegments = [];
+     let rawSegments = [];
 
-let appleSpecs = [];
+     let appleSpecs = [];
 
 2.**Branch Growth Animationz**
 
 -By extending the Segment class, add time control attributes and interpolation calculations
 
- class Segment{
-    constructor(){
-         this.revealTime = 0;
-        this.growDuration = 500;
-    }
-    draw(){
-        let progress = contrain((currentTime - this. revearlTime) / this.growDuration, 0, 1);
-        let  X = lerp(this.x, this.x2, progress);
-        let  Y = lerp(this.y, this.y2, progress);
-    }
- }
+     class Segment{
+          constructor(){
+            this.revealTime = 0;
+            this.growDuration = 500;
+             }
+          draw(){
+            let progress = contrain((currentTime - this.   revearlTime) / this.growDuration, 0, 1);
+            let  X = lerp(this.x, this.x2, progress);
+            let  Y = lerp(this.y, this.y2, progress);
+            }
+         }
 
 3.**Randomised design**
 
